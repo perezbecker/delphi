@@ -1,0 +1,89 @@
+{% set user_id = user.id %}
+{# group, standings, matches, predictions, locked are passed from context #}
+<div class="card h-100" id="group-{{ group }}">
+  <div class="card-header fw-bold bg-dark text-white py-2">
+    Group {{ group }}
+  </div>
+  <div class="card-body p-0">
+
+    <!-- Standings table -->
+    <table class="table table-sm table-bordered mb-0 standings-table">
+      <thead class="table-secondary">
+        <tr>
+          <th class="ps-2">#</th>
+          <th>Team</th>
+          <th class="text-center">P</th>
+          <th class="text-center">W</th>
+          <th class="text-center">D</th>
+          <th class="text-center">L</th>
+          <th class="text-center">GF</th>
+          <th class="text-center">GA</th>
+          <th class="text-center">GD</th>
+          <th class="text-center fw-bold">Pts</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in standings %}
+        <tr {% if loop.index <= 2 %}class="table-success"{% elif loop.index == 3 %}class="table-warning"{% endif %}>
+          <td class="ps-2 text-muted small">{{ loop.index }}</td>
+          <td class="fw-semibold">{{ s.team.flag }} {{ s.team.name }}</td>
+          <td class="text-center">{{ s.played }}</td>
+          <td class="text-center">{{ s.wins }}</td>
+          <td class="text-center">{{ s.draws }}</td>
+          <td class="text-center">{{ s.losses }}</td>
+          <td class="text-center">{{ s.gf }}</td>
+          <td class="text-center">{{ s.ga }}</td>
+          <td class="text-center">{{ s.gd }}</td>
+          <td class="text-center fw-bold">{{ s.points }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Match score inputs -->
+    <div class="px-2 pb-2 pt-1">
+      {% for m in matches %}
+        {% set pred = predictions.get(m.match_id) if predictions else None %}
+        {% set h_val = pred[0] if pred and pred is iterable and pred is not string else "" %}
+        {% set a_val = pred[1] if pred and pred is iterable and pred is not string else "" %}
+
+        <form class="match-row d-flex align-items-center gap-1 my-1"
+              {% if not locked %}
+              hx-post="/predictions/group/{{ m.match_id }}"
+              hx-target="#group-{{ group }}"
+              hx-swap="outerHTML"
+              hx-trigger="change"
+              {% endif %}>
+
+          <span class="team-flag-name text-end flex-grow-1 small">
+            {{ m.home.flag }} {{ m.home.name }}
+          </span>
+
+          <input type="number" name="home_score" class="form-control form-control-sm score-input text-center"
+                 min="0" max="20" value="{{ h_val }}"
+                 {% if locked %}disabled{% endif %}
+                 required>
+
+          <span class="text-muted fw-bold">–</span>
+
+          <input type="number" name="away_score" class="form-control form-control-sm score-input text-center"
+                 min="0" max="20" value="{{ a_val }}"
+                 {% if locked %}disabled{% endif %}
+                 required>
+
+          <span class="team-flag-name flex-grow-1 small">
+            {{ m.away.flag }} {{ m.away.name }}
+          </span>
+
+          <span class="text-muted small">MD{{ m.match_day }}</span>
+        </form>
+      {% endfor %}
+    </div>
+
+  </div>
+  <!-- Key: green=advances, yellow=possible 3rd, white=eliminated -->
+  <div class="card-footer py-1 small text-muted">
+    <span class="badge bg-success">■</span> Advances
+    <span class="badge bg-warning text-dark ms-1">■</span> Possible 3rd
+  </div>
+</div>

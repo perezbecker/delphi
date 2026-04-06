@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Register — Delphi 2026{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="card-title text-center mb-4">⚽ Register</h2>
+
+        {% if error %}
+        <div class="alert alert-danger py-2">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="/register">
+          <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-control" type="text" id="username" name="username"
+                   minlength="3" maxlength="50" autocomplete="username" required autofocus>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="password">Password</label>
+            <input class="form-control" type="password" id="password" name="password"
+                   minlength="6" autocomplete="new-password" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="invite_code">Invite Code</label>
+            <input class="form-control" type="password" id="invite_code" name="invite_code" required>
+            <div class="form-text">Ask the pool organiser for the invite code.</div>
+          </div>
+          <div class="d-grid">
+            <button class="btn btn-success" type="submit">Create Account</button>
+          </div>
+        </form>
+
+        <hr>
+        <p class="text-center mb-0 small">
+          Already registered? <a href="/login">Login</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

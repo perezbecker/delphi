@@ -1,0 +1,131 @@
+{#
+  Context:
+    matches_by_id, bracket_r32_order, bracket_r16_order, bracket_qf_order,
+    bracket_sf_order, bracket_f_order, bracket_tops, bracket_height,
+    bracket_svg_paths, round_labels, locked, readonly
+#}
+
+{% macro match_card(ms, left, top, locked, readonly) %}
+<div class="bk-card" style="top: {{ top }}px; left: {{ left }}px;">
+  <div class="match-num">M{{ ms.match_num }}</div>
+
+  {# Home team #}
+  {% if ms.home_team %}
+    {% if not locked and not readonly %}
+      <form hx-post="/predictions/knockout/{{ ms.match_id }}"
+            hx-target="#knockout-bracket" hx-swap="outerHTML" style="margin:0;">
+        <input type="hidden" name="winner_code" value="{{ ms.home_team.code }}">
+        <button type="submit"
+          class="bk-team-btn{% if ms.predicted_winner and ms.predicted_winner.code == ms.home_team.code %} winner{% endif %}">
+          {{ ms.home_team.flag }} {{ ms.home_team.name }}
+        </button>
+      </form>
+    {% else %}
+      <div class="bk-team{% if ms.predicted_winner and ms.predicted_winner.code == ms.home_team.code %} winner{% endif %}">
+        {{ ms.home_team.flag }} {{ ms.home_team.name }}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="bk-team tbd">TBD</div>
+  {% endif %}
+
+  {# Away team #}
+  {% if ms.away_team %}
+    {% if not locked and not readonly %}
+      <form hx-post="/predictions/knockout/{{ ms.match_id }}"
+            hx-target="#knockout-bracket" hx-swap="outerHTML" style="margin:0;">
+        <input type="hidden" name="winner_code" value="{{ ms.away_team.code }}">
+        <button type="submit"
+          class="bk-team-btn{% if ms.predicted_winner and ms.predicted_winner.code == ms.away_team.code %} winner{% endif %}">
+          {{ ms.away_team.flag }} {{ ms.away_team.name }}
+        </button>
+      </form>
+    {% else %}
+      <div class="bk-team{% if ms.predicted_winner and ms.predicted_winner.code == ms.away_team.code %} winner{% endif %}">
+        {{ ms.away_team.flag }} {{ ms.away_team.name }}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="bk-team tbd">TBD</div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+<div id="knockout-bracket">
+  <div class="bracket-scroll">
+    <div class="bracket-layout" style="height: {{ bracket_height + 50 }}px;">
+
+      {# ── Column headers ── #}
+      {% set header_pts = {"R32": 1, "R16": 2, "QF": 4, "SF": 8, "F": 16} %}
+      {% for round, left in [("R32", 0), ("R16", 200), ("QF", 400), ("SF", 600), ("F", 800)] %}
+      <div class="bracket-header-cell" style="left: {{ left }}px; top: 0;">
+        {{ round_labels[round] }}
+        <span class="badge bg-secondary ms-1" style="font-size:0.65rem;">+{{ header_pts[round] }}pt</span>
+      </div>
+      {% endfor %}
+
+      {# ── Bracket body ── #}
+      <div class="bracket-body" style="position: absolute; top: 44px; left: 0; right: 0; height: {{ bracket_height }}px;">
+
+        {# R32 column (left: 0) #}
+        {% for match_id in bracket_r32_order %}
+          {% set ms = matches_by_id[match_id] %}
+          {{ match_card(ms, 0, bracket_tops[match_id], locked, readonly) }}
+        {% endfor %}
+
+        {# SVG: R32 → R16 #}
+        <svg class="bk-svg" style="left: 170px;" width="30" height="{{ bracket_height }}"
+             viewBox="0 0 30 {{ bracket_height }}" preserveAspectRatio="none">
+          <path d="{{ bracket_svg_paths['R32_R16'] }}"
+                stroke="#adb5bd" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+
+        {# R16 column (left: 200) #}
+        {% for match_id in bracket_r16_order %}
+          {% set ms = matches_by_id[match_id] %}
+          {{ match_card(ms, 200, bracket_tops[match_id], locked, readonly) }}
+        {% endfor %}
+
+        {# SVG: R16 → QF #}
+        <svg class="bk-svg" style="left: 370px;" width="30" height="{{ bracket_height }}"
+             viewBox="0 0 30 {{ bracket_height }}" preserveAspectRatio="none">
+          <path d="{{ bracket_svg_paths['R16_QF'] }}"
+                stroke="#adb5bd" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+
+        {# QF column (left: 400) #}
+        {% for match_id in bracket_qf_order %}
+          {% set ms = matches_by_id[match_id] %}
+          {{ match_card(ms, 400, bracket_tops[match_id], locked, readonly) }}
+        {% endfor %}
+
+        {# SVG: QF → SF #}
+        <svg class="bk-svg" style="left: 570px;" width="30" height="{{ bracket_height }}"
+             viewBox="0 0 30 {{ bracket_height }}" preserveAspectRatio="none">
+          <path d="{{ bracket_svg_paths['QF_SF'] }}"
+                stroke="#adb5bd" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+
+        {# SF column (left: 600) #}
+        {% for match_id in bracket_sf_order %}
+          {% set ms = matches_by_id[match_id] %}
+          {{ match_card(ms, 600, bracket_tops[match_id], locked, readonly) }}
+        {% endfor %}
+
+        {# SVG: SF → F #}
+        <svg class="bk-svg" style="left: 770px;" width="30" height="{{ bracket_height }}"
+             viewBox="0 0 30 {{ bracket_height }}" preserveAspectRatio="none">
+          <path d="{{ bracket_svg_paths['SF_F'] }}"
+                stroke="#adb5bd" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+
+        {# Final column (left: 800) #}
+        {% for match_id in bracket_f_order %}
+          {% set ms = matches_by_id[match_id] %}
+          {{ match_card(ms, 800, bracket_tops[match_id], locked, readonly) }}
+        {% endfor %}
+
+      </div>{# /bracket-body #}
+    </div>{# /bracket-layout #}
+  </div>{# /bracket-scroll #}
+</div>{# /knockout-bracket #}

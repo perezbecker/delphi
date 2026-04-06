@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}
+  {% if readonly %}{{ target_user.username }}'s Bracket{% else %}My Bracket{% endif %} — Delphi 2026
+{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h2 class="mb-0">
+    {% if readonly %}
+      {{ target_user.flag if target_user.flag else "👤" }} {{ target_user.username }}'s Predictions
+    {% else %}
+      ⚽ My Predictions
+    {% endif %}
+  </h2>
+  {% if locked %}
+    <span class="badge bg-danger fs-6">🔒 Predictions Locked</span>
+  {% else %}
+    <span class="badge bg-success fs-6">✏️ Open for Predictions</span>
+  {% endif %}
+</div>
+
+{% if not readonly and not locked %}
+<div class="alert alert-info py-2 small">
+  Fill in predicted scores for all group games. The knockout bracket will auto-populate.
+  All predictions lock at tournament kickoff.
+</div>
+{% endif %}
+
+{% if locked %}
+<div class="card mb-3 border-0 bg-light">
+  <div class="card-body py-2 px-3 d-flex align-items-center gap-2 flex-wrap">
+    <span class="small fw-semibold text-muted">Viewing:</span>
+    <select class="form-select form-select-sm" style="max-width: 200px;"
+            onchange="window.location='/predictions/'+this.value">
+      {% for u in all_users %}
+      <option value="{{ u.username }}"
+        {% if readonly and target_user and target_user.username == u.username %}selected
+        {% elif not readonly and user.username == u.username %}selected
+        {% endif %}>{{ u.username }}</option>
+      {% endfor %}
+    </select>
+    {% if readonly %}
+    <a href="/predictions" class="btn btn-sm btn-outline-secondary">← My Bracket</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-3" id="bracketTabs">
+  <li class="nav-item">
+    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-groups">
+      Group Stage
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-knockout"
+            hx-get="{% if readonly %}/predictions/{{ target_user.username }}/knockout{% else %}/predictions/knockout{% endif %}"
+            hx-target="#knockout-bracket"
+            hx-swap="outerHTML"
+            hx-trigger="click once">
+      Knockout Stage
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <!-- Group Stage Tab -->
+  <div class="tab-pane fade show active" id="tab-groups">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+      {% for group in groups %}
+        {% set standings = bracket.group_standings[group] %}
+        {% set matches = group_matches[group] %}
+        <div class="col">
+          {% include "predictions/partials/group_card.html" %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Knockout Tab -->
+  <div class="tab-pane fade" id="tab-knockout">
+    <div id="knockout-wrapper"
+         hx-get="{% if readonly %}/predictions/{{ target_user.username }}/knockout{% else %}/predictions/knockout{% endif %}"
+         hx-target="#knockout-bracket"
+         hx-swap="outerHTML"
+         hx-trigger="refreshKnockout from:body">
+      <div id="knockout-bracket">
+        <div class="text-center text-muted py-5">
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Loading knockout bracket…
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
