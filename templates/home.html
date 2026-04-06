@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Quiniela Mundialista Miau 2026{% endblock %}
+{% block content %}
+
+<!-- Hero -->
+<div class="text-center mb-5">
+  <img src="/images/quiniela.png" alt="Quiniela Mundialista Miau 2026"
+       class="img-fluid rounded-3 shadow mb-4"
+       style="max-height: 320px; object-fit: contain;">
+  <h1 class="display-5 fw-bold">🏆 Quiniela Mundialista Miau 2026</h1>
+  <p class="lead text-muted">Copa del Mundo · USA, Canadá &amp; México · Junio–Julio 2026</p>
+  <div class="d-flex justify-content-center gap-3 mt-4">
+    <a href="/login" class="btn btn-primary btn-lg px-4">Iniciar sesión</a>
+    <a href="/register" class="btn btn-outline-secondary btn-lg px-4">Registrarse</a>
+  </div>
+</div>
+
+<hr class="my-5">
+
+<!-- Rules -->
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    <h2 class="fw-bold mb-4">📋 Reglas del juego</h2>
+
+    <!-- Phase 1: Group Stage -->
+    <div class="card mb-4 border-0 shadow-sm">
+      <div class="card-header bg-primary text-white fw-bold py-2">
+        ⚽ Fase de Grupos — 72 partidos
+      </div>
+      <div class="card-body">
+        <ul class="mb-0">
+          <li class="mb-2">
+            Predice el <strong>marcador exacto</strong> de cada partido de la fase de grupos
+            (por ejemplo: 2–1, 0–0, 3–2).
+          </li>
+          <li class="mb-2">
+            El resultado (victoria local / empate / victoria visitante) se determina
+            automáticamente a partir del marcador que ingreses.
+          </li>
+          <li class="mb-2">
+            Se otorga <strong>1 punto</strong> por cada resultado acertado. No es necesario
+            adivinar el marcador exacto, solo el resultado (G / E / P).
+          </li>
+          <li>
+            Los marcadores predichos se usan como criterio de desempate en las tablas de
+            posiciones del grupo, siguiendo las reglas oficiales de la FIFA
+            (diferencia de goles, goles a favor, resultados cara a cara, etc.).
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase 2: Knockout -->
+    <div class="card mb-4 border-0 shadow-sm">
+      <div class="card-header bg-success text-white fw-bold py-2">
+        🏅 Fase Eliminatoria — Ronda de 32 hasta la Final
+      </div>
+      <div class="card-body">
+        <ul class="mb-2">
+          <li class="mb-2">
+            A partir de la Ronda de 32, elige al <strong>equipo ganador</strong>
+            de cada partido. No se predice marcador.
+          </li>
+          <li class="mb-2">
+            El bracket se completa automáticamente según tus predicciones de grupos:
+            los equipos que avanzas en grupos son los que aparecen en la fase eliminatoria.
+          </li>
+          <li class="mb-2">
+            El ganador real del partido se considera correcto independientemente de si el
+            partido terminó en tiempo regular, prórroga o penales.
+          </li>
+          <li>
+            <strong>No hay predicción para el partido por el tercer lugar.</strong>
+          </li>
+        </ul>
+        <div class="table-responsive mt-3">
+          <table class="table table-bordered table-sm mb-0 text-center" style="max-width: 360px;">
+            <thead class="table-dark">
+              <tr>
+                <th class="text-start ps-3">Ronda</th>
+                <th>Puntos por acierto</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="text-start ps-3">Ronda de 32</td><td><strong>1</strong></td></tr>
+              <tr><td class="text-start ps-3">Octavos de final</td><td><strong>2</strong></td></tr>
+              <tr><td class="text-start ps-3">Cuartos de final</td><td><strong>4</strong></td></tr>
+              <tr><td class="text-start ps-3">Semifinal</td><td><strong>8</strong></td></tr>
+              <tr class="table-warning"><td class="text-start ps-3">Final</td><td><strong>16</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- General rules -->
+    <div class="card mb-4 border-0 shadow-sm">
+      <div class="card-header bg-secondary text-white fw-bold py-2">
+        📌 Reglas generales
+      </div>
+      <div class="card-body">
+        <ul class="mb-0">
+          <li class="mb-2">
+            Todas las predicciones se <strong>bloquean automáticamente</strong> al inicio
+            del torneo (11 de junio de 2026 a las 18:00 UTC). Una vez bloqueadas, no se
+            pueden modificar.
+          </li>
+          <li class="mb-2">
+            Tras el inicio del torneo podrás ver los brackets de todos los demás
+            participantes y comparar predicciones.
+          </li>
+          <li class="mb-2">
+            Si modificas alguna predicción de la fase de grupos, tus predicciones de la
+            fase eliminatoria se reinician automáticamente, ya que los equipos que avanzan
+            pueden cambiar.
+          </li>
+          <li>
+            El marcador en tiempo real se actualiza en el <strong>Leaderboard</strong>
+            conforme el administrador registra los resultados reales de cada partido.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="/register" class="btn btn-primary btn-lg px-5">¡Regístrate ahora!</a>
+      <p class="text-muted small mt-2">Necesitas un código de invitación para participar.</p>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

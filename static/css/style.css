@@ -1,0 +1,159 @@
+/* ── Delphi 2026 — Custom Styles ──────────────────────────────────────────── */
+
+/* Score input boxes — compact */
+.score-input {
+  width: 52px !important;
+  min-width: 52px;
+  padding: 2px 4px;
+}
+
+/* Team name in match row */
+.team-flag-name {
+  min-width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Group standings table — tighten up */
+.standings-table th,
+.standings-table td {
+  padding: 3px 5px !important;
+  font-size: 0.8rem;
+}
+
+/* ── Knockout Bracket ────────────────────────────────────────────────────── */
+
+.bracket-scroll {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
+.bracket-layout {
+  position: relative;
+  min-width: 970px;
+}
+
+.bracket-header-cell {
+  position: absolute;
+  width: 170px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: center;
+  background: #212529;
+  color: #fff;
+  border-radius: 4px;
+  padding: 4px 2px;
+}
+
+.bracket-body {
+  position: absolute;
+}
+
+.bk-card {
+  position: absolute;
+  width: 170px;
+  height: 80px;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 4px 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+  overflow: hidden;
+}
+
+.bk-card .match-num {
+  font-size: 0.65rem;
+  color: #6c757d;
+  line-height: 1.3;
+}
+
+.bk-card .bk-team {
+  font-size: 0.78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-top: 1px;
+  cursor: default;
+  line-height: 1.35;
+}
+
+.bk-card .bk-team-btn {
+  display: block;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 3px;
+  padding: 1px 6px;
+  margin-top: 1px;
+  line-height: 1.35;
+  border: 1px solid #dee2e6;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bk-card .bk-team-btn:hover {
+  background: #e9ecef;
+}
+
+.bk-card .bk-team.winner,
+.bk-card .bk-team-btn.winner {
+  background: #198754;
+  color: #fff;
+  font-weight: 600;
+  border-color: #198754;
+}
+
+.bk-card .bk-team.tbd {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.bk-svg {
+  position: absolute;
+  top: 0;
+}
+
+/* ── Match rows in group card ────────────────────────────────────────────── */
+
+.match-row {
+  font-size: 0.82rem;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 3px;
+}
+
+.match-row:last-child {
+  border-bottom: none;
+}
+
+/* ── Leaderboard ─────────────────────────────────────────────────────────── */
+
+.table-primary td, .table-primary th {
+  background-color: #cfe2ff !important;
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────────────── */
+
+.navbar-brand {
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+}
+
+/* ── General ─────────────────────────────────────────────────────────────── */
+
+body {
+  background-color: #f8f9fa;
+}
+
+.card {
+  border-radius: 8px;
+}
+
+.card-header {
+  border-radius: 8px 8px 0 0 !important;
+}

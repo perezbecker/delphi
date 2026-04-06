@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard — Delphi 2026{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h2 class="mb-0">🏆 Leaderboard</h2>
+  <small class="text-muted">Auto-refreshes every 60s</small>
+</div>
+
+<div id="leaderboard-table"
+     hx-get="/leaderboard"
+     hx-trigger="every 60s"
+     hx-swap="outerHTML"
+     hx-select="#leaderboard-table">
+
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th class="text-center">#</th>
+          <th>Player</th>
+          <th class="text-center fw-bold">Total</th>
+          <th class="text-center small">Group Stage</th>
+          <th class="text-center small">R32</th>
+          <th class="text-center small">R16</th>
+          <th class="text-center small">QF</th>
+          <th class="text-center small">SF</th>
+          <th class="text-center small">Final</th>
+          <th class="text-center small">Correct</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        {% set score = row.score %}
+        {% set u = row.user %}
+        <tr {% if u.id == user.id %}class="table-primary fw-semibold"{% endif %}>
+          <td class="text-center">
+            {% if row.rank == 1 %}🥇
+            {% elif row.rank == 2 %}🥈
+            {% elif row.rank == 3 %}🥉
+            {% else %}{{ row.rank }}
+            {% endif %}
+          </td>
+          <td>
+            <a href="/predictions/{{ u.username }}" class="text-decoration-none">
+              {{ u.username }}
+            </a>
+            {% if u.id == user.id %}<span class="badge bg-primary ms-1">you</span>{% endif %}
+          </td>
+          <td class="text-center fs-5 fw-bold">{{ score.total }}</td>
+          <td class="text-center">{{ score.by_round.GS }}</td>
+          <td class="text-center">{{ score.by_round.R32 }}</td>
+          <td class="text-center">{{ score.by_round.R16 }}</td>
+          <td class="text-center">{{ score.by_round.QF }}</td>
+          <td class="text-center">{{ score.by_round.SF }}</td>
+          <td class="text-center">{{ score.by_round.F }}</td>
+          <td class="text-center text-muted small">{{ score.correct }}/{{ score.total_predicted }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="10" class="text-center text-muted">No predictions yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}
