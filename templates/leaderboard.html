@@ -27,6 +27,7 @@
           <th class="text-center small">SF</th>
           <th class="text-center small">Final</th>
           <th class="text-center small">Correct</th>
+          <th class="text-center small">Predictions</th>
         </tr>
       </thead>
       <tbody>
@@ -55,6 +56,12 @@
           <td class="text-center">{{ score.by_round.SF }}</td>
           <td class="text-center">{{ score.by_round.F }}</td>
           <td class="text-center text-muted small">{{ score.correct }}/{{ score.total_predicted }}</td>
+          <td class="text-center small">
+            {% set pct = (score.predictions_made / total_matches * 100) | round | int %}
+            <span class="{{ 'text-success fw-semibold' if pct == 100 else 'text-warning' }}">
+              {{ score.predictions_made }}/{{ total_matches }} ({{ pct }}%)
+            </span>
+          </td>
         </tr>
         {% else %}
         <tr><td colspan="10" class="text-center text-muted">No predictions yet.</td></tr>

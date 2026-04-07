@@ -10,6 +10,8 @@ from sqlalchemy.orm import Session
 from app.models import ActualResult, Prediction, User
 from app.tournament.data import ROUND_POINTS, GROUP_MATCH_BY_ID, KNOCKOUT_BY_ID
 
+TOTAL_MATCHES = len(GROUP_MATCH_BY_ID) + len(KNOCKOUT_BY_ID)  # 72 + 31 = 103
+
 
 @dataclass
 class ScoreBreakdown:
@@ -19,6 +21,7 @@ class ScoreBreakdown:
     })
     correct: int = 0   # number of correct predictions
     total_predicted: int = 0
+    predictions_made: int = 0  # number of matches the user has filled in
 
 
 def _gs_outcome(home: int, away: int) -> int:
@@ -33,6 +36,12 @@ def compute_user_score(user_id: int, db: Session) -> ScoreBreakdown:
 
     predictions = {p.match_id: p for p in db.query(Prediction).filter(Prediction.user_id == user_id)}
     results = {r.match_id: r for r in db.query(ActualResult).filter(ActualResult.completed == True)}
+
+    breakdown.predictions_made = sum(
+        1 for p in predictions.values()
+        if (p.match_id.startswith("GS_") and p.home_score is not None and p.away_score is not None)
+        or (not p.match_id.startswith("GS_") and p.winner_code is not None)
+    )
 
     # Group stage: compare outcome (W/D/L)
     for match_id, result in results.items():
@@ -69,14 +78,15 @@ def compute_user_score(user_id: int, db: Session) -> ScoreBreakdown:
         km = KNOCKOUT_BY_ID.get(match_id)
         if km:
             pred_by_round[km.round].add(pred.winner_code)
-            breakdown.total_predicted += 1
 
     for round_name, actual_winners in actual_by_round.items():
-        correct_picks = pred_by_round.get(round_name, set()) & actual_winners
+        round_preds = pred_by_round.get(round_name, set())
+        correct_picks = round_preds & actual_winners
         pts = len(correct_picks) * ROUND_POINTS[round_name]
         breakdown.total += pts
         breakdown.by_round[round_name] += pts
         breakdown.correct += len(correct_picks)
+        breakdown.total_predicted += len(round_preds)
 
     return breakdown
 
