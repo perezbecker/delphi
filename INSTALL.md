@@ -109,7 +109,7 @@ az login
 
 ```bash
 RESOURCE_GROUP="delphi-rg"
-LOCATION="eastus"                  # or "westeurope", etc.
+LOCATION="centralus"                  # or "westeurope", etc.
 PG_SERVER="delphi-db-server"       # must be globally unique
 PG_ADMIN_USER="delphiadmin"
 PG_ADMIN_PASSWORD="<strong-password>"   # min 8 chars, upper+lower+digit
@@ -170,7 +170,7 @@ az postgres flexible-server show-connection-string \
   --admin-user $PG_ADMIN_USER \
   --admin-password "$PG_ADMIN_PASSWORD" \
   --database-name $PG_DB_NAME \
-  --query connectionStrings.psycopg2 \
+  --query "connectionStrings.python" \
   --output tsv
 ```
 
