@@ -157,7 +157,7 @@ No third-place playoff — excluded from all predictions and scoring.
 ### Group Stage
 - Users predict **exact scores** (e.g. 2–1) for all 72 group matches.
 - Winner/draw outcome is derived from the score: `sign(home - away)`.
-- Points are awarded for correct **outcome** (W/D/L) only — not exact score.
+- Points are awarded for correct **outcome** (W/D/L). An exact score awards 3 points instead of 1.
 - Predicted scores are used for FIFA tiebreaker calculations.
 
 ### Knockout Stage
@@ -301,7 +301,7 @@ Total cost: ~$25/month. Can stop the PostgreSQL server between tournaments to sa
 
 | Decision | Reason |
 |---|---|
-| No exact-score points | Owner only wants to award correct outcome prediction |
+| 3 pts for exact score | Rewards more precise predictions; 3× multiplier is slightly undervalued vs. pure probability but keeps numbers clean |
 | Exact scores collected anyway | Needed for FIFA group stage tiebreaker rules |
 | HTMX not React/Vue | Python-friendly, no build step, sufficient for this scale |
 | SQLite for dev | Zero-config local setup |
