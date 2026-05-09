@@ -173,9 +173,10 @@ No third-place playoff — excluded from all predictions and scoring.
 
 ## Scoring
 
-| Round | Points (correct winner) |
+| Round | Points |
 |---|---|
-| Group Stage (W/D/L outcome) | 1 |
+| Group Stage (exact score) | 3 |
+| Group Stage (correct outcome W/D/L) | 1 |
 | Round of 32 | 1 |
 | Round of 16 | 2 |
 | Quarterfinals | 4 |
