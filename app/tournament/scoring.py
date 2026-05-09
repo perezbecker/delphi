@@ -56,7 +56,10 @@ def compute_user_score(user_id: int, db: Session) -> ScoreBreakdown:
             continue
         breakdown.total_predicted += 1
         if _gs_outcome(pred.home_score, pred.away_score) == _gs_outcome(result.home_score, result.away_score):
-            pts = ROUND_POINTS["GS"]
+            if pred.home_score == result.home_score and pred.away_score == result.away_score:
+                pts = 3  # Exact score match
+            else:
+                pts = ROUND_POINTS["GS"]  # Correct outcome only
             breakdown.total += pts
             breakdown.by_round["GS"] += pts
             breakdown.correct += 1
