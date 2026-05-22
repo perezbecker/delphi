@@ -424,17 +424,19 @@ The algorithm:
 class ScoreBreakdown:
     total: int
     by_round: dict[str, int]   # e.g. {"GS": 5, "R32": 2, "R16": 4, ...}
-    correct: int               # total correct predictions
-    total_predicted: int       # predictions evaluated against a completed result
-    predictions_made: int      # predictions the user has filled in
+    predictions_made: int      # predictions the user has filled in (out of 103)
     exact_scores: int          # group-stage matches with the exact predicted score
+    gs_correct: int            # group-stage matches with the correct outcome (includes exact-score hits)
+    ko_correct: int            # knockout teams correctly picked to advance, summed across all rounds
 ```
+
+`TOTAL_GS_MATCHES = 72` and `TOTAL_KO_MATCHES = 31` are exposed alongside `TOTAL_MATCHES = 103` so templates can render fixed denominators (e.g. `gs_correct / 72`, `ko_correct / 31`).
 
 **`compute_user_score(user_id, db)`**:
 1. Loads all `ActualResult` rows where `completed=True`.
 2. Loads all `Prediction` rows for the user.
-3. For group stage matches: derives the outcome (W/D/L) from `sign(home - away)` for both the prediction and the actual result. If the predicted exact score matches the actual exact score, awards **3 points** and increments `exact_scores`. Otherwise, if only the outcome matches, awards `ROUND_POINTS["GS"] = 1`.
-4. For knockout matches: compares `Prediction.winner_code` to `ActualResult.winner_code`. Awards `ROUND_POINTS[round]` if they match.
+3. For group stage matches: derives the outcome (W/D/L) from `sign(home - away)` for both the prediction and the actual result. If the predicted exact score matches the actual exact score, awards **3 points** and increments `exact_scores`. Otherwise, if only the outcome matches, awards `ROUND_POINTS["GS"] = 1`. Any correct-outcome match (exact or not) also increments `gs_correct`.
+4. For knockout matches: uses round-based scoring. Builds two per-round sets — actual winners (from completed `ActualResult` rows) and the user's predicted winners. For each round, awards `ROUND_POINTS[round]` per team in the intersection and adds the intersection size to `ko_correct`.
 5. Returns a `ScoreBreakdown`.
 
 **`compute_all_scores(db)`**: Runs `compute_user_score` for every user. Returns `dict[user_id, ScoreBreakdown]`. Used by the leaderboard route.
@@ -563,7 +565,15 @@ Shows a ranked table of all users. Uses HTMX auto-refresh:
 </div>
 ```
 
-Columns: Rank (medal emoji for top 3), Username (clickable link to their predictions, only when locked), Total Score, per-round score breakdown (GS / R32 / R16 / QF / SF / F), an Exact column showing `exact_scores / 72` (count of exact group-stage score hits), Correct (correct/evaluated predictions), and Predictions (filled-in/103). The logged-in user's row is highlighted.
+Columns are grouped into four regions separated by thick vertical borders (`.section-divider` CSS class):
+
+1. **Identity**: Rank (medal emoji for top 3), Username (clickable link to their predictions when locked).
+2. **Total**: aggregate score across all rounds.
+3. **Group-stage block**: GS points, Exact (`exact_scores / 72`), GS Correct (`gs_correct / 72` — outcomes correctly predicted, including exact-score hits).
+4. **Knockout block**: per-round points (R32 / R16 / QF / SF / Final), KO Correct (`ko_correct / 31` — teams correctly picked to advance, summed across all rounds).
+5. **Completion**: Predictions (`predictions_made / 103` with a percentage).
+
+The logged-in user's row is highlighted via `table-primary`.
 
 ---
 

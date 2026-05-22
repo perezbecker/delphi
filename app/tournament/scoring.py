@@ -11,7 +11,8 @@ from app.models import ActualResult, Prediction, User
 from app.tournament.data import ROUND_POINTS, GROUP_MATCH_BY_ID, KNOCKOUT_BY_ID
 
 TOTAL_GS_MATCHES = len(GROUP_MATCH_BY_ID)  # 72
-TOTAL_MATCHES = TOTAL_GS_MATCHES + len(KNOCKOUT_BY_ID)  # 72 + 31 = 103
+TOTAL_KO_MATCHES = len(KNOCKOUT_BY_ID)     # 31
+TOTAL_MATCHES = TOTAL_GS_MATCHES + TOTAL_KO_MATCHES  # 103
 
 
 @dataclass
@@ -20,10 +21,10 @@ class ScoreBreakdown:
     by_round: dict[str, int] = field(default_factory=lambda: {
         "GS": 0, "R32": 0, "R16": 0, "QF": 0, "SF": 0, "F": 0,
     })
-    correct: int = 0   # number of correct predictions
-    total_predicted: int = 0
     predictions_made: int = 0  # number of matches the user has filled in
-    exact_scores: int = 0  # number of group-stage matches with the exact predicted score
+    exact_scores: int = 0  # group-stage matches with the exact predicted score
+    gs_correct: int = 0    # group-stage matches with the correct outcome (includes exact scores)
+    ko_correct: int = 0    # knockout teams correctly picked to advance, summed across all rounds
 
 
 def _gs_outcome(home: int, away: int) -> int:
@@ -56,7 +57,6 @@ def compute_user_score(user_id: int, db: Session) -> ScoreBreakdown:
             continue
         if result.home_score is None or result.away_score is None:
             continue
-        breakdown.total_predicted += 1
         if _gs_outcome(pred.home_score, pred.away_score) == _gs_outcome(result.home_score, result.away_score):
             if pred.home_score == result.home_score and pred.away_score == result.away_score:
                 pts = 3  # Exact score match
@@ -65,7 +65,7 @@ def compute_user_score(user_id: int, db: Session) -> ScoreBreakdown:
                 pts = ROUND_POINTS["GS"]  # Correct outcome only
             breakdown.total += pts
             breakdown.by_round["GS"] += pts
-            breakdown.correct += 1
+            breakdown.gs_correct += 1
 
     # Knockout: round-based — award points if the predicted team won in that round,
     # regardless of which specific match slot they ended up in.
@@ -91,8 +91,7 @@ def compute_user_score(user_id: int, db: Session) -> ScoreBreakdown:
         pts = len(correct_picks) * ROUND_POINTS[round_name]
         breakdown.total += pts
         breakdown.by_round[round_name] += pts
-        breakdown.correct += len(correct_picks)
-        breakdown.total_predicted += len(round_preds)
+        breakdown.ko_correct += len(correct_picks)
 
     return breakdown
 
