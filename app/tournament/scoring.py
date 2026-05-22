@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 from app.models import ActualResult, Prediction, User
 from app.tournament.data import ROUND_POINTS, GROUP_MATCH_BY_ID, KNOCKOUT_BY_ID
 
-TOTAL_MATCHES = len(GROUP_MATCH_BY_ID) + len(KNOCKOUT_BY_ID)  # 72 + 31 = 103
+TOTAL_GS_MATCHES = len(GROUP_MATCH_BY_ID)  # 72
+TOTAL_MATCHES = TOTAL_GS_MATCHES + len(KNOCKOUT_BY_ID)  # 72 + 31 = 103
 
 
 @dataclass
@@ -22,6 +23,7 @@ class ScoreBreakdown:
     correct: int = 0   # number of correct predictions
     total_predicted: int = 0
     predictions_made: int = 0  # number of matches the user has filled in
+    exact_scores: int = 0  # number of group-stage matches with the exact predicted score
 
 
 def _gs_outcome(home: int, away: int) -> int:
@@ -58,6 +60,7 @@ def compute_user_score(user_id: int, db: Session) -> ScoreBreakdown:
         if _gs_outcome(pred.home_score, pred.away_score) == _gs_outcome(result.home_score, result.away_score):
             if pred.home_score == result.home_score and pred.away_score == result.away_score:
                 pts = 3  # Exact score match
+                breakdown.exact_scores += 1
             else:
                 pts = ROUND_POINTS["GS"]  # Correct outcome only
             breakdown.total += pts

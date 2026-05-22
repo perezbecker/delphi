@@ -270,18 +270,18 @@ The single source of truth for all tournament structure. No database reads — e
 
 **`Team` dataclass**:
 ```python
-@dataclass
+@dataclass(frozen=True)
 class Team:
-    code: str        # e.g. "MEX"
-    name: str        # e.g. "Mexico"
-    flag: str        # Unicode emoji e.g. "🇲🇽"
-    group: str       # "A" through "L"
-    fifa_rank: int   # Used as final tiebreaker in group standings
+    code: str          # e.g. "MEX"
+    name: str          # e.g. "Mexico"
+    flag: str          # Unicode emoji e.g. "🇲🇽"
+    group: str         # "A" through "L"
+    fifa_ranking: int  # Used as final tiebreaker in group standings
 ```
 
 48 teams are defined (4 per group × 12 groups). `TEAM_BY_CODE` is a dict for O(1) lookup. `TEAMS_BY_GROUP` groups them by group letter. `GROUPS` is the list `["A", "B", ..., "L"]`.
 
-**`GroupMatch` dataclass**: `match_id`, `home` (Team), `away` (Team), `group`. `GROUP_MATCHES` contains all 72 round-robin matches (each pair within each group of 4 plays once). `GROUP_MATCHES_BY_GROUP` indexes them by group for the template.
+**`GroupMatch` dataclass**: `match_id`, `group`, `match_day` (1–3), `home_code`, `away_code` — with `home` and `away` properties resolving the codes to `Team` instances via `TEAM_BY_CODE`. `GROUP_MATCHES` contains all 72 round-robin matches (each pair within each group of 4 plays once). `GROUP_MATCHES_BY_GROUP` indexes them by group for the template.
 
 **`KnockoutMatch` dataclass**: `match_id`, `round` (e.g. `"R32"`), `match_num` (73–103), `home_slot`, `away_slot`. Slots use a string encoding:
 - `"W_A"` — winner of Group A
@@ -320,16 +320,17 @@ Computes where each team finishes in their group based on predicted (or actual) 
 @dataclass
 class TeamStanding:
     team: Team
+    played: int
     wins: int
     draws: int
     losses: int
-    goals_for: int
-    goals_against: int
+    gf: int   # goals for
+    ga: int   # goals against
 
     @property
     def points(self): return self.wins * 3 + self.draws
     @property
-    def gd(self): return self.goals_for - self.goals_against
+    def gd(self): return self.gf - self.ga
 ```
 
 **`compute_group_standings(group, scores)`**:
@@ -424,13 +425,15 @@ class ScoreBreakdown:
     total: int
     by_round: dict[str, int]   # e.g. {"GS": 5, "R32": 2, "R16": 4, ...}
     correct: int               # total correct predictions
-    total_predicted: int       # total predictions made
+    total_predicted: int       # predictions evaluated against a completed result
+    predictions_made: int      # predictions the user has filled in
+    exact_scores: int          # group-stage matches with the exact predicted score
 ```
 
 **`compute_user_score(user_id, db)`**:
 1. Loads all `ActualResult` rows where `completed=True`.
 2. Loads all `Prediction` rows for the user.
-3. For group stage matches: derives the outcome (W/D/L) from `sign(home - away)` for both the prediction and the actual result. Awards `ROUND_POINTS["GS"] = 1` if they match.
+3. For group stage matches: derives the outcome (W/D/L) from `sign(home - away)` for both the prediction and the actual result. If the predicted exact score matches the actual exact score, awards **3 points** and increments `exact_scores`. Otherwise, if only the outcome matches, awards `ROUND_POINTS["GS"] = 1`.
 4. For knockout matches: compares `Prediction.winner_code` to `ActualResult.winner_code`. Awards `ROUND_POINTS[round]` if they match.
 5. Returns a `ScoreBreakdown`.
 
@@ -456,7 +459,7 @@ All pages extend this. Provides:
 
 Shown to unauthenticated visitors. All text is in Spanish. Sections:
 - **Hero**: `images/quiniela.png` banner image, "Quiniela Mundialista Miau 2026" heading, Login and Register buttons.
-- **Fase de Grupos card**: Explains group stage prediction rules (predict exact scores, 1 point per correct outcome, scores used for FIFA tiebreakers).
+- **Fase de Grupos card**: Explains group stage prediction rules (predict exact scores; 3 points for an exact-score match, 1 point for the correct outcome; scores used for FIFA tiebreakers).
 - **Fase Eliminatoria card**: Explains knockout predictions (pick the winner of each match), includes the points-per-round scoring table (1/2/4/8/16).
 - **Reglas Generales card**: Lock time (June 11 2026 18:00 UTC), visibility of other brackets after lock, knockout reset on group stage changes, leaderboard update process.
 
@@ -560,7 +563,7 @@ Shows a ranked table of all users. Uses HTMX auto-refresh:
 </div>
 ```
 
-Columns: Rank (medal emoji for top 3), Username (clickable link to their predictions, only when locked), Total Score, per-round score breakdown (GS / R32 / R16 / QF / SF / F). The logged-in user's row is highlighted.
+Columns: Rank (medal emoji for top 3), Username (clickable link to their predictions, only when locked), Total Score, per-round score breakdown (GS / R32 / R16 / QF / SF / F), an Exact column showing `exact_scores / 72` (count of exact group-stage score hits), Correct (correct/evaluated predictions), and Predictions (filled-in/103). The logged-in user's row is highlighted.
 
 ---
 
