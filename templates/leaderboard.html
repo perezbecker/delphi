@@ -19,16 +19,17 @@
         <tr>
           <th class="text-center">#</th>
           <th>Player</th>
-          <th class="text-center fw-bold">Total</th>
-          <th class="text-center small">Group Stage</th>
+          <th class="text-center fw-bold section-divider">Total</th>
+          <th class="text-center small section-divider">Group Stage</th>
           <th class="text-center small">Exact</th>
-          <th class="text-center small">R32</th>
+          <th class="text-center small">GS Correct</th>
+          <th class="text-center small section-divider">R32</th>
           <th class="text-center small">R16</th>
           <th class="text-center small">QF</th>
           <th class="text-center small">SF</th>
           <th class="text-center small">Final</th>
-          <th class="text-center small">Correct</th>
-          <th class="text-center small">Predictions</th>
+          <th class="text-center small">KO Correct</th>
+          <th class="text-center small section-divider">Predictions</th>
         </tr>
       </thead>
       <tbody>
@@ -49,16 +50,17 @@
             </a>
             {% if u.id == user.id %}<span class="badge bg-primary ms-1">you</span>{% endif %}
           </td>
-          <td class="text-center fs-5 fw-bold">{{ score.total }}</td>
-          <td class="text-center">{{ score.by_round.GS }}</td>
+          <td class="text-center fs-5 fw-bold section-divider">{{ score.total }}</td>
+          <td class="text-center section-divider">{{ score.by_round.GS }}</td>
           <td class="text-center text-muted small">{{ score.exact_scores }}/{{ total_gs_matches }}</td>
-          <td class="text-center">{{ score.by_round.R32 }}</td>
+          <td class="text-center text-muted small">{{ score.gs_correct }}/{{ total_gs_matches }}</td>
+          <td class="text-center section-divider">{{ score.by_round.R32 }}</td>
           <td class="text-center">{{ score.by_round.R16 }}</td>
           <td class="text-center">{{ score.by_round.QF }}</td>
           <td class="text-center">{{ score.by_round.SF }}</td>
           <td class="text-center">{{ score.by_round.F }}</td>
-          <td class="text-center text-muted small">{{ score.correct }}/{{ score.total_predicted }}</td>
-          <td class="text-center small">
+          <td class="text-center text-muted small">{{ score.ko_correct }}/{{ total_ko_matches }}</td>
+          <td class="text-center small section-divider">
             {% set pct = (score.predictions_made / total_matches * 100) | round | int %}
             <span class="{{ 'text-success fw-semibold' if pct == 100 else 'text-warning' }}">
               {{ score.predictions_made }}/{{ total_matches }} ({{ pct }}%)
@@ -66,7 +68,7 @@
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="11" class="text-center text-muted">No predictions yet.</td></tr>
+        <tr><td colspan="12" class="text-center text-muted">No predictions yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>

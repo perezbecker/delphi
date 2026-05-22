@@ -137,6 +137,11 @@
   background-color: #cfe2ff !important;
 }
 
+/* Thick vertical separator between leaderboard sections (Total / GS / KO / Predictions) */
+.section-divider {
+  border-left: 3px solid #495057 !important;
+}
+
 /* ── Navbar ──────────────────────────────────────────────────────────────── */
 
 .navbar-brand {
