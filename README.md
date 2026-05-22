@@ -7,7 +7,7 @@ A private bracket pool web app for World Cup 2026, built for a group of ~30 frie
 ## What it does
 
 - **Registration** — invite-code gated, no email verification needed
-- **Group stage predictions** — users enter exact scores (e.g. 2–1) for all 72 group matches; points are awarded for correct outcome (W/D/L), not exact score; predicted scores feed into FIFA tiebreaker calculations to determine group standings
+- **Group stage predictions** — users enter exact scores (e.g. 2–1) for all 72 group matches; 1 point is awarded for a correct outcome (W/D/L) and 3 points for an exact-score match; predicted scores feed into FIFA tiebreaker calculations to determine group standings
 - **Knockout bracket** — dynamically built from each user's group stage predictions; users click to pick the winner of each match from Round of 32 through the Final; points scale by round (1 → 2 → 4 → 8 → 16)
 - **Round-based knockout scoring** — points are awarded if the picked team won in that round, regardless of which specific match slot they ended up in (important for WC2026's 48-team format where bracket paths vary)
 - **Live leaderboard** — auto-refreshes every 60s; shows per-round point breakdown for each participant

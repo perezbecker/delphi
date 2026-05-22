@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.auth import require_user
 from app.database import get_db
 from app.models import User
-from app.tournament.scoring import ScoreBreakdown, compute_all_scores, TOTAL_MATCHES
+from app.tournament.scoring import ScoreBreakdown, compute_all_scores, TOTAL_GS_MATCHES, TOTAL_MATCHES
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -38,4 +38,5 @@ def leaderboard(
         "user": user,
         "rows": rows,
         "total_matches": TOTAL_MATCHES,
+        "total_gs_matches": TOTAL_GS_MATCHES,
     })

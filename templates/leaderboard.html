@@ -21,6 +21,7 @@
           <th>Player</th>
           <th class="text-center fw-bold">Total</th>
           <th class="text-center small">Group Stage</th>
+          <th class="text-center small">Exact</th>
           <th class="text-center small">R32</th>
           <th class="text-center small">R16</th>
           <th class="text-center small">QF</th>
@@ -50,6 +51,7 @@
           </td>
           <td class="text-center fs-5 fw-bold">{{ score.total }}</td>
           <td class="text-center">{{ score.by_round.GS }}</td>
+          <td class="text-center text-muted small">{{ score.exact_scores }}/{{ total_gs_matches }}</td>
           <td class="text-center">{{ score.by_round.R32 }}</td>
           <td class="text-center">{{ score.by_round.R16 }}</td>
           <td class="text-center">{{ score.by_round.QF }}</td>
@@ -64,7 +66,7 @@
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="10" class="text-center text-muted">No predictions yet.</td></tr>
+        <tr><td colspan="11" class="text-center text-muted">No predictions yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>
