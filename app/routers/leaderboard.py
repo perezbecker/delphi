@@ -4,12 +4,14 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from app.auth import require_user
+from app.config import settings
 from app.database import get_db
 from app.models import User
 from app.tournament.scoring import ScoreBreakdown, compute_all_scores, TOTAL_GS_MATCHES, TOTAL_KO_MATCHES, TOTAL_MATCHES
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+templates.env.globals["is_locked"] = settings.is_locked
 
 
 @router.get("/leaderboard", response_class=HTMLResponse)

@@ -17,6 +17,7 @@ from app.models import User
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+templates.env.globals["is_locked"] = settings.is_locked
 
 
 @router.get("/login", response_class=HTMLResponse)

@@ -25,6 +25,14 @@ class ScoreBreakdown:
     exact_scores: int = 0  # group-stage matches with the exact predicted score
     gs_correct: int = 0    # group-stage matches with the correct outcome (includes exact scores)
     ko_correct: int = 0    # knockout teams correctly picked to advance, summed across all rounds
+    # Points earned per match_id. Sums to `total`; lets callers (e.g. the daily
+    # view) attribute points to a specific day without diverging from the totals.
+    points_by_match: dict[str, int] = field(default_factory=dict)
+    # round → set of team codes the user correctly picked to win that round
+    # (predicted-winners ∩ actual-winners). Authoritative source for the per-round
+    # view's highlighting, so it can never diverge from the scoring above:
+    # len(ko_correct_picks[r]) * ROUND_POINTS[r] == by_round[r].
+    ko_correct_picks: dict[str, set[str]] = field(default_factory=dict)
 
 
 def _gs_outcome(home: int, away: int) -> int:
@@ -65,6 +73,7 @@ def compute_user_score(user_id: int, db: Session) -> ScoreBreakdown:
                 pts = ROUND_POINTS["GS"]  # Correct outcome only
             breakdown.total += pts
             breakdown.by_round["GS"] += pts
+            breakdown.points_by_match[match_id] = pts
             breakdown.gs_correct += 1
 
     # Knockout: round-based — award points if the predicted team won in that round,
@@ -85,13 +94,26 @@ def compute_user_score(user_id: int, db: Session) -> ScoreBreakdown:
         if km:
             pred_by_round[km.round].add(pred.winner_code)
 
+    correct_by_round: dict[str, set[str]] = {}
     for round_name, actual_winners in actual_by_round.items():
         round_preds = pred_by_round.get(round_name, set())
         correct_picks = round_preds & actual_winners
+        correct_by_round[round_name] = correct_picks
         pts = len(correct_picks) * ROUND_POINTS[round_name]
         breakdown.total += pts
         breakdown.by_round[round_name] += pts
         breakdown.ko_correct += len(correct_picks)
+    breakdown.ko_correct_picks = correct_by_round
+
+    # Attribute each round's points to the actual match where the correctly-picked
+    # team won. A team wins at most one match per round, so the per-match sum equals
+    # the round total computed above (keeps daily totals consistent with the leaderboard).
+    for match_id, result in results.items():
+        km = KNOCKOUT_BY_ID.get(match_id)
+        if km is None or not result.winner_code:
+            continue
+        if result.winner_code in correct_by_round.get(km.round, set()):
+            breakdown.points_by_match[match_id] = ROUND_POINTS[km.round]
 
     return breakdown
 

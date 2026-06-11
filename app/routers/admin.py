@@ -9,6 +9,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from app.auth import require_admin
+from app.config import settings
 from app.database import get_db
 from app.models import ActualResult, Prediction, User
 from app.tournament.data import (
@@ -21,6 +22,7 @@ from app.tournament.data import (
 
 router = APIRouter(prefix="/admin")
 templates = Jinja2Templates(directory="templates")
+templates.env.globals["is_locked"] = settings.is_locked
 
 
 @router.get("", response_class=HTMLResponse)

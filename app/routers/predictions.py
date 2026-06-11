@@ -25,6 +25,7 @@ from app.tournament.data import (
 
 router = APIRouter(prefix="/predictions")
 templates = Jinja2Templates(directory="templates")
+templates.env.globals["is_locked"] = settings.is_locked
 
 
 def _get_bracket(user_id: int, db: Session):
