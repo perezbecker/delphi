@@ -4,6 +4,7 @@ Groups confirmed from the official FIFA draw (December 5, 2025, Washington D.C.)
 """
 
 from dataclasses import dataclass, field
+from datetime import date
 
 
 @dataclass(frozen=True)
@@ -289,3 +290,126 @@ BRACKET_SVG_PATHS: dict[str, str] = {
     ),
     "SF_F": "M 0 400 H 15 V 1200 M 0 1200 H 15 M 15 800 H 30",
 }
+
+
+# ── Match schedule (calendar dates) ───────────────────────────────────────────
+# Official FIFA World Cup 2026 fixture dates. Used by the daily-results view.
+#
+# IMPORTANT: group-stage matches are dated by the *actual pair of teams* playing,
+# NOT by the synthetic `match_day` produced by `_build_group_matches`. The
+# algorithmic pairing/match_day does not match the real calendar (e.g. Mexico v
+# South Africa — the June 11 opener — is labelled GS_A_3 / match_day 2), and the
+# two fixtures of a group's match-day can even fall on different dates (e.g. Group
+# B's Canada–Bosnia is June 12 while Qatar–Switzerland is June 13). Keying by the
+# unordered team-code pair is therefore the only correct mapping.
+
+# (home_code, away_code, date) — order within the pair is irrelevant; it is
+# normalised to a frozenset below. Every one of the 72 group-stage round-robin
+# pairings appears exactly once.
+_GROUP_FIXTURES: list[tuple[str, str, date]] = [
+    # Group A
+    ("MEX", "RSA", date(2026, 6, 11)), ("KOR", "CZE", date(2026, 6, 11)),
+    ("CZE", "RSA", date(2026, 6, 18)), ("MEX", "KOR", date(2026, 6, 18)),
+    ("MEX", "CZE", date(2026, 6, 24)), ("KOR", "RSA", date(2026, 6, 24)),
+    # Group B
+    ("CAN", "BIH", date(2026, 6, 12)), ("QAT", "SUI", date(2026, 6, 13)),
+    ("SUI", "BIH", date(2026, 6, 18)), ("CAN", "QAT", date(2026, 6, 18)),
+    ("SUI", "CAN", date(2026, 6, 24)), ("BIH", "QAT", date(2026, 6, 24)),
+    # Group C
+    ("BRA", "MAR", date(2026, 6, 13)), ("HAI", "SCO", date(2026, 6, 13)),
+    ("SCO", "MAR", date(2026, 6, 19)), ("BRA", "HAI", date(2026, 6, 19)),
+    ("BRA", "SCO", date(2026, 6, 24)), ("MAR", "HAI", date(2026, 6, 24)),
+    # Group D
+    ("USA", "PAR", date(2026, 6, 12)), ("AUS", "TUR", date(2026, 6, 13)),
+    ("USA", "AUS", date(2026, 6, 19)), ("TUR", "PAR", date(2026, 6, 19)),
+    ("USA", "TUR", date(2026, 6, 25)), ("PAR", "AUS", date(2026, 6, 25)),
+    # Group E
+    ("GER", "CUW", date(2026, 6, 14)), ("CIV", "ECU", date(2026, 6, 14)),
+    ("GER", "CIV", date(2026, 6, 20)), ("ECU", "CUW", date(2026, 6, 20)),
+    ("ECU", "GER", date(2026, 6, 25)), ("CUW", "CIV", date(2026, 6, 25)),
+    # Group F
+    ("NED", "JPN", date(2026, 6, 14)), ("TUN", "SWE", date(2026, 6, 14)),
+    ("NED", "SWE", date(2026, 6, 20)), ("TUN", "JPN", date(2026, 6, 20)),
+    ("TUN", "NED", date(2026, 6, 25)), ("JPN", "SWE", date(2026, 6, 25)),
+    # Group G
+    ("BEL", "EGY", date(2026, 6, 15)), ("IRN", "NZL", date(2026, 6, 15)),
+    ("BEL", "IRN", date(2026, 6, 21)), ("NZL", "EGY", date(2026, 6, 21)),
+    ("NZL", "BEL", date(2026, 6, 26)), ("EGY", "IRN", date(2026, 6, 26)),
+    # Group H
+    ("ESP", "CPV", date(2026, 6, 15)), ("KSA", "URU", date(2026, 6, 15)),
+    ("ESP", "KSA", date(2026, 6, 21)), ("URU", "CPV", date(2026, 6, 21)),
+    ("URU", "ESP", date(2026, 6, 26)), ("CPV", "KSA", date(2026, 6, 26)),
+    # Group I
+    ("FRA", "SEN", date(2026, 6, 16)), ("IRQ", "NOR", date(2026, 6, 16)),
+    ("FRA", "IRQ", date(2026, 6, 22)), ("NOR", "SEN", date(2026, 6, 22)),
+    ("NOR", "FRA", date(2026, 6, 26)), ("SEN", "IRQ", date(2026, 6, 26)),
+    # Group J
+    ("ARG", "ALG", date(2026, 6, 16)), ("AUT", "JOR", date(2026, 6, 16)),
+    ("ARG", "AUT", date(2026, 6, 22)), ("JOR", "ALG", date(2026, 6, 22)),
+    ("ARG", "JOR", date(2026, 6, 27)), ("ALG", "AUT", date(2026, 6, 27)),
+    # Group K
+    ("POR", "COD", date(2026, 6, 17)), ("UZB", "COL", date(2026, 6, 17)),
+    ("POR", "UZB", date(2026, 6, 23)), ("COL", "COD", date(2026, 6, 23)),
+    ("COL", "POR", date(2026, 6, 27)), ("COD", "UZB", date(2026, 6, 27)),
+    # Group L
+    ("ENG", "CRO", date(2026, 6, 17)), ("GHA", "PAN", date(2026, 6, 17)),
+    ("ENG", "GHA", date(2026, 6, 23)), ("PAN", "CRO", date(2026, 6, 23)),
+    ("PAN", "ENG", date(2026, 6, 27)), ("CRO", "GHA", date(2026, 6, 27)),
+]
+
+_GROUP_FIXTURE_DATE: dict[frozenset[str], date] = {
+    frozenset((a, b)): d for a, b, d in _GROUP_FIXTURES
+}
+
+# Knockout dates keyed by the app's match_id (== FIFA match number for R32–SF).
+# NOTE: F_103 is the actual Final (FIFA match 104, July 19). The app excludes the
+# third-place play-off (real match 103, July 18), so July 18 has no app match.
+_KNOCKOUT_DATES: dict[str, date] = {
+    "R32_73": date(2026, 6, 28),
+    "R32_74": date(2026, 6, 29), "R32_75": date(2026, 6, 29), "R32_76": date(2026, 6, 29),
+    "R32_77": date(2026, 6, 30), "R32_78": date(2026, 6, 30), "R32_79": date(2026, 6, 30),
+    "R32_80": date(2026, 7, 1), "R32_81": date(2026, 7, 1), "R32_82": date(2026, 7, 1),
+    "R32_83": date(2026, 7, 2), "R32_84": date(2026, 7, 2), "R32_85": date(2026, 7, 2),
+    "R32_86": date(2026, 7, 3), "R32_87": date(2026, 7, 3), "R32_88": date(2026, 7, 3),
+    "R16_89": date(2026, 7, 4), "R16_90": date(2026, 7, 4),
+    "R16_91": date(2026, 7, 5), "R16_92": date(2026, 7, 5),
+    "R16_93": date(2026, 7, 6), "R16_94": date(2026, 7, 6),
+    "R16_95": date(2026, 7, 7), "R16_96": date(2026, 7, 7),
+    "QF_97": date(2026, 7, 9), "QF_98": date(2026, 7, 10),
+    "QF_99": date(2026, 7, 11), "QF_100": date(2026, 7, 11),
+    "SF_101": date(2026, 7, 14), "SF_102": date(2026, 7, 15),
+    "F_103": date(2026, 7, 19),
+}
+
+
+def _build_match_dates() -> dict[str, date]:
+    """match_id → calendar date for all 103 matches (72 group + 31 knockout)."""
+    out: dict[str, date] = {}
+    for gm in GROUP_MATCHES:
+        key = frozenset((gm.home_code, gm.away_code))
+        d = _GROUP_FIXTURE_DATE.get(key)
+        if d is None:
+            raise ValueError(
+                f"No schedule date for group match {gm.match_id} "
+                f"({gm.home_code} vs {gm.away_code}); _GROUP_FIXTURES is incomplete or has a typo."
+            )
+        out[gm.match_id] = d
+    for km in KNOCKOUT_MATCHES:
+        d = _KNOCKOUT_DATES.get(km.match_id)
+        if d is None:
+            raise ValueError(f"No schedule date for knockout match {km.match_id}.")
+        out[km.match_id] = d
+    return out
+
+
+MATCH_DATE: dict[str, date] = _build_match_dates()
+
+MATCHES_BY_DATE: dict[date, list[str]] = {}
+for _mid, _d in MATCH_DATE.items():
+    MATCHES_BY_DATE.setdefault(_d, []).append(_mid)
+# Stable ordering within a day: group-stage matches first, then knockout by match number.
+for _d, _ids in MATCHES_BY_DATE.items():
+    _ids.sort(key=lambda m: (not m.startswith("GS_"),
+                             KNOCKOUT_BY_ID[m].match_num if m in KNOCKOUT_BY_ID else m))
+
+TOURNAMENT_DATES: list[date] = sorted(MATCHES_BY_DATE.keys())

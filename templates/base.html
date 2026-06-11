@@ -20,6 +20,9 @@
       <ul class="navbar-nav ms-auto">
         {% if user %}
         <li class="nav-item"><a class="nav-link" href="/predictions">My Bracket</a></li>
+        {% if is_locked() %}
+        <li class="nav-item"><a class="nav-link" href="/today">Daily</a></li>
+        {% endif %}
         <li class="nav-item"><a class="nav-link" href="/leaderboard">Leaderboard</a></li>
         {% if user.is_admin %}
         <li class="nav-item"><a class="nav-link text-warning" href="/admin/results">Admin</a></li>

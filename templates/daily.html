@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}{{ the_date.strftime('%B %-d, %Y') }} — Daily — Delphi 2026{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <h2 class="mb-0">
+    📅 {{ the_date.strftime('%A, %B %-d, %Y') }}
+    {% if is_today %}<span class="badge bg-success align-middle ms-1">Today</span>{% endif %}
+  </h2>
+  <div class="btn-group">
+    {% if prev_link %}
+      <a class="btn btn-outline-secondary btn-sm" href="{{ prev_link.url }}">← {{ prev_link.label }}</a>
+    {% else %}
+      <button class="btn btn-outline-secondary btn-sm" disabled>←</button>
+    {% endif %}
+    <a class="btn btn-outline-primary btn-sm" href="/today">Today</a>
+    {% if next_link %}
+      <a class="btn btn-outline-secondary btn-sm" href="{{ next_link.url }}">{{ next_link.label }} →</a>
+    {% else %}
+      <button class="btn btn-outline-secondary btn-sm" disabled>→</button>
+    {% endif %}
+  </div>
+</div>
+
+{% if not matches %}
+  <div class="alert alert-light border text-muted">No matches scheduled on this date.</div>
+{% else %}
+
+  {% if any_completed %}
+  <div class="card mb-4">
+    <div class="card-header bg-dark text-white py-2">🏅 Points earned this day</div>
+    <div class="card-body py-2">
+      <div class="d-flex flex-wrap gap-2">
+        {% for row in totals_ranked %}
+          <span class="badge {{ 'bg-primary' if row.user.id == user.id else 'bg-light text-dark border' }} fs-6">
+            {{ row.user.username }} <strong>{{ row.points }}</strong>
+          </span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% for m in matches %}
+  <div class="card mb-4">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-1 py-2">
+      <span class="fw-semibold">
+        {{ m.heading.home.flag }} {{ m.heading.home.name }}
+        <span class="text-muted mx-1">vs</span>
+        {{ m.heading.away.flag }} {{ m.heading.away.name }}
+      </span>
+      <span>
+        <span class="badge bg-secondary">{{ m.round_label }}</span>
+        <span class="badge bg-info text-dark">+{{ m.round_points }}pt</span>
+        {% if m.completed %}
+          <span class="badge bg-success">Result: {{ m.actual if m.actual else '—' }}</span>
+        {% else %}
+          <span class="badge bg-light text-muted border">Not played</span>
+        {% endif %}
+      </span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Player</th>
+            <th>Prediction</th>
+            <th class="text-center">Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in m.user_rows %}
+          <tr {% if r.user.id == user.id %}class="table-primary"{% endif %}>
+            <td>{{ r.user.username }}{% if r.user.id == user.id %} <span class="badge bg-primary ms-1">you</span>{% endif %}</td>
+            <td>{{ r.pred_display if r.pred_display else '—' }}</td>
+            <td class="text-center">
+              {% if r.points is none %}
+                <span class="text-muted">—</span>
+              {% elif r.points > 0 %}
+                <span class="badge bg-success">+{{ r.points }}</span>
+              {% else %}
+                <span class="text-muted">0</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endfor %}
+
+{% endif %}
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ round_label }} — Predictions — Delphi 2026{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <h2 class="mb-0">
+    🏆 {{ round_label }}
+    <span class="badge bg-info text-dark align-middle">+{{ round_points }}pt each</span>
+    {% if is_today %}<span class="badge bg-success align-middle">Today</span>{% endif %}
+  </h2>
+  <div class="btn-group">
+    {% if prev_link %}
+      <a class="btn btn-outline-secondary btn-sm" href="{{ prev_link.url }}">← {{ prev_link.label }}</a>
+    {% else %}
+      <button class="btn btn-outline-secondary btn-sm" disabled>←</button>
+    {% endif %}
+    <a class="btn btn-outline-primary btn-sm" href="/today">Today</a>
+    {% if next_link %}
+      <a class="btn btn-outline-secondary btn-sm" href="{{ next_link.url }}">{{ next_link.label }} →</a>
+    {% else %}
+      <button class="btn btn-outline-secondary btn-sm" disabled>→</button>
+    {% endif %}
+  </div>
+</div>
+
+<p class="text-muted small mb-3">
+  Each row shows the teams a player picked to win this round.
+  <span class="badge bg-success">green</span> = that team actually won a match in this round
+  (so it scores), regardless of which tie it ended up in — exactly how the leaderboard counts it.
+  Winners decided so far: <strong>{{ decided_count }}/{{ num_matches }}</strong>.
+</p>
+
+<div class="table-responsive">
+  <table class="table table-sm table-bordered align-middle text-center mb-0" style="white-space:nowrap;">
+    <thead class="table-dark">
+      <tr>
+        <th class="text-center">#</th>
+        <th class="text-start">Player</th>
+        {% for i in range(num_matches) %}<th class="px-1"></th>{% endfor %}
+        <th class="text-center">✓</th>
+        <th class="text-center">Pts</th>
+      </tr>
+      <tr class="table-secondary">
+        <th></th>
+        <th class="text-start fst-italic">Actual winners</th>
+        {% for team in actual_cells %}
+          <td class="px-1 fs-5">
+            {% if team %}<span title="{{ team.name }}">{{ team.flag }}</span>{% else %}<span class="text-muted">·</span>{% endif %}
+          </td>
+        {% endfor %}
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in user_rows %}
+      <tr {% if row.user.id == user.id %}class="table-primary"{% endif %}>
+        <td class="text-center">{{ row.rank }}</td>
+        <td class="text-start">
+          {{ row.user.username }}{% if row.user.id == user.id %} <span class="badge bg-primary ms-1">you</span>{% endif %}
+        </td>
+        {% for cell in row.cells %}
+          <td class="px-1 fs-5 {% if cell.correct %}table-success fw-bold{% endif %}">
+            {% if cell.team %}<span title="{{ cell.team.name }}">{{ cell.team.flag }}</span>{% else %}<span class="text-muted">—</span>{% endif %}
+          </td>
+        {% endfor %}
+        <td class="text-center">{{ row.correct_count }}</td>
+        <td class="text-center fw-bold">{{ row.points }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="{{ num_matches + 4 }}" class="text-muted">No players yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

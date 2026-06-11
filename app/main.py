@@ -10,7 +10,7 @@ from app.auth import get_current_user
 from app.config import settings
 from app.database import Base, SessionLocal, engine
 from app.models import User
-from app.routers import admin, auth, leaderboard, predictions
+from app.routers import admin, auth, daily, leaderboard, predictions
 
 
 @asynccontextmanager
@@ -38,8 +38,12 @@ app.include_router(auth.router)
 app.include_router(predictions.router)
 app.include_router(leaderboard.router)
 app.include_router(admin.router)
+# Registered last: its "/{match_date}" route is greedy, so all explicit routes
+# above take precedence.
+app.include_router(daily.router)
 
 templates = Jinja2Templates(directory="templates")
+templates.env.globals["is_locked"] = settings.is_locked
 
 
 @app.get("/", response_class=HTMLResponse)
