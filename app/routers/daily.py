@@ -14,7 +14,8 @@ maths is read straight from the scoring engine (`compute_all_scores`), so these
 views can never diverge from the leaderboard.
 """
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -40,6 +41,15 @@ from app.tournament.scoring import compute_all_scores
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 templates.env.globals["is_locked"] = settings.is_locked
+
+
+# "Today" rolls over at midnight Pacific Time (the tournament is in North
+# America). ZoneInfo handles the PDT/PST DST switch automatically.
+PACIFIC = ZoneInfo("America/Los_Angeles")
+
+
+def _today_pacific() -> date:
+    return datetime.now(tz=PACIFIC).date()
 
 
 # ── Timeline: group-stage dates, then knockout rounds ─────────────────────────
@@ -96,7 +106,7 @@ def _require_locked():
 @router.get("/today")
 def today(user: User = Depends(require_user)):
     _require_locked()
-    today_d = datetime.now(tz=timezone.utc).date()
+    today_d = _today_pacific()
     if today_d <= LAST_GS_DATE:
         target = f"/{today_d.isoformat()}"
     else:
@@ -163,7 +173,7 @@ def ko_round(
 
     prev_link, next_link = _nav_links(KO_ROUND_RANGE[rc][0])
     start, end = KO_ROUND_RANGE[rc]
-    today_d = datetime.now(tz=timezone.utc).date()
+    today_d = _today_pacific()
 
     return templates.TemplateResponse(request, "ko_round.html", {
         "user": user,
@@ -217,7 +227,6 @@ def daily(
         scores = compute_all_scores(db)
 
     matches = []
-    day_totals: dict[int, int] = {u.id: 0 for u in users}
 
     for mid in match_ids:
         result = results.get(mid)
@@ -239,8 +248,6 @@ def daily(
             else:
                 pred_display = None
             pts = scores[u.id].points_by_match.get(mid, 0) if completed else None
-            if pts:
-                day_totals[u.id] += pts
             user_rows.append({
                 "user": u,
                 "pred_display": pred_display,
@@ -257,14 +264,8 @@ def daily(
             "user_rows": user_rows,
         })
 
-    any_completed = any(m["completed"] for m in matches)
-    totals_ranked = sorted(
-        ({"user": u, "points": day_totals[u.id]} for u in users),
-        key=lambda r: r["points"], reverse=True,
-    )
-
     prev_link, next_link = _nav_links(d)
-    today_d = datetime.now(tz=timezone.utc).date()
+    today_d = _today_pacific()
 
     return templates.TemplateResponse(request, "daily.html", {
         "user": user,
@@ -273,7 +274,5 @@ def daily(
         "prev_link": prev_link,
         "next_link": next_link,
         "matches": matches,
-        "totals_ranked": totals_ranked,
-        "any_completed": any_completed,
         "num_users": len(users),
     })

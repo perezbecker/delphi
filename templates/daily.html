@@ -26,21 +26,6 @@
   <div class="alert alert-light border text-muted">No matches scheduled on this date.</div>
 {% else %}
 
-  {% if any_completed %}
-  <div class="card mb-4">
-    <div class="card-header bg-dark text-white py-2">🏅 Points earned this day</div>
-    <div class="card-body py-2">
-      <div class="d-flex flex-wrap gap-2">
-        {% for row in totals_ranked %}
-          <span class="badge {{ 'bg-primary' if row.user.id == user.id else 'bg-light text-dark border' }} fs-6">
-            {{ row.user.username }} <strong>{{ row.points }}</strong>
-          </span>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-  {% endif %}
-
   {% for m in matches %}
   <div class="card mb-4">
     <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-1 py-2">
